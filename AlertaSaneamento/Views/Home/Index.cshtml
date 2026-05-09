@@ -1,0 +1,90 @@
+﻿@{
+    ViewData["Title"] = "Início";
+    Layout = "_Layout";
+}
+
+<!-- BANNER PRINCIPAL -->
+<section class="banner-section position-relative text-white text-center"
+         style="background: linear-gradient(135deg, #1a6e3c 0%, #2d9e5f 100%); min-height: 420px; display: flex; align-items: center;">
+    <div class="container py-5">
+        <h1 class="display-4 fw-bold mb-3">Alerta Saneamento</h1>
+        <p class="lead mb-4">
+            Registre problemas de saneamento básico na sua cidade.<br />
+            Juntos fiscalizamos e cobramos soluções.
+        </p>
+        @if (Context.Session.GetString("UsuarioId") == null)
+        {
+            <a asp-controller="Usuario" asp-action="Cadastro" class="btn btn-light btn-lg me-2 fw-semibold">Criar conta</a>
+            <a asp-controller="Usuario" asp-action="Login" class="btn btn-outline-light btn-lg">Entrar</a>
+        }
+        else
+        {
+            <a asp-controller="Alerta" asp-action="Create" class="btn btn-light btn-lg me-2 fw-semibold">Registrar Alerta</a>
+            <a asp-controller="Alerta" asp-action="Index" class="btn btn-outline-light btn-lg">Ver Alertas</a>
+        }
+    </div>
+</section>
+
+<!-- ESPAÇO PARA BANNERS / CAMPANHAS -->
+<section class="container my-5">
+    <h5 class="text-muted mb-3">Campanhas e Informações</h5>
+    <div class="row g-3">
+        <!-- Banner 1 -->
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm h-100 overflow-hidden">
+                <img src="https://res.cloudinary.com/dp57rchhi/image/upload/v1778366560/banner_1_ux6f3r.png"
+                     class="img-fluid w-100 h-100"
+                     style="object-fit: cover; min-height: 160px;"
+                     alt="Banner 1" />
+            </div>
+        </div>
+        <!-- Banner 2 -->
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm h-100 overflow-hidden">
+                <img src="https://res.cloudinary.com/dp57rchhi/image/upload/v1778366569/banner_2_ofzlzg.png"
+                     class="img-fluid w-100 h-100"
+                     style="object-fit: cover; min-height: 160px;"
+                     alt="Banner 2" />
+            </div>
+        </div>
+        <!-- Banner 3 -->
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm h-100 overflow-hidden">
+                <img src="https://res.cloudinary.com/dp57rchhi/image/upload/v1778366582/banner_3_ftnt10.png"
+                     class="img-fluid w-100 h-100"
+                     style="object-fit: cover; min-height: 160px;"
+                     alt="Banner 3" />
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- COMO FUNCIONA -->
+<section style="background-color: #f0f7f3;" class="py-5">
+    <div class="container text-center">
+        <h2 class="mb-4 fw-bold">Como funciona</h2>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="p-4">
+                    <div style="font-size: 2.5rem;">📸</div>
+                    <h5 class="mt-3 fw-semibold">1. Registre</h5>
+                    <p class="text-muted">Fotografe e descreva o problema de saneamento que você encontrou.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="p-4">
+                    <div style="font-size: 2.5rem;">🔍</div>
+                    <h5 class="mt-3 fw-semibold">2. Fiscalize</h5>
+                    <p class="text-muted">Nossa equipe de fiscais analisa e acompanha cada relato registrado.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="p-4">
+                    <div style="font-size: 2.5rem;">✅</div>
+                    <h5 class="mt-3 fw-semibold">3. Acompanhe</h5>
+                    <p class="text-muted">Receba atualizações sobre o andamento da resolução do seu alerta.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

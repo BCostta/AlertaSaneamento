@@ -1,0 +1,99 @@
+@model AlertaSaneamento.Models.Entities.Alerta
+
+@{
+    ViewData["Title"] = "Detalhes do Alerta";
+    bool isFiscal = Context.Session.GetString("UsuarioTipo") == "Fiscal";
+}
+
+<div class="container py-4" style="max-width: 760px;">
+
+    <a asp-action="Index" class="btn btn-link ps-0 mb-3">← Voltar</a>
+
+    @if (TempData["Sucesso"] != null)
+    {
+        <div class="alert alert-success">@TempData["Sucesso"]</div>
+    }
+    @if (TempData["Erro"] != null)
+    {
+        <div class="alert alert-danger">@TempData["Erro"]</div>
+    }
+
+    <!-- DADOS DO ALERTA -->
+    <div class="card shadow-sm border-0 mb-4">
+        @if (Model.imagem != null)
+        {
+            <img src="data:@Model.imagemTipo;base64,@Convert.ToBase64String(Model.imagem)"
+                 class="card-img-top"
+                 alt="Imagem do alerta"
+                 style="max-height: 320px; object-fit: cover;" />
+        }
+        <div class="card-body">
+            <h5 class="fw-bold">Relato</h5>
+            <p>@Model.relato</p>
+
+            @if (!string.IsNullOrEmpty(Model.Endereco))
+            {
+                <p class="text-muted mb-1">
+                    📍 <strong>Local:</strong> @Model.Endereco
+                </p>
+            }
+
+            @if (Model.Latitude.HasValue && Model.Longitude.HasValue)
+            {
+                <a href="https://www.google.com/maps?q=@Model.Latitude,@Model.Longitude"
+                   target="_blank" class="btn btn-sm btn-outline-secondary mb-2">
+                    🗺️ Ver no mapa
+                </a>
+            }
+
+            <p class="text-muted small mb-0">
+                👤 @Model.Usuario?.Nome &nbsp;|&nbsp;
+                🕐 @Model.CriadoEm.ToLocalTime().ToString("dd/MM/yyyy HH:mm")
+            </p>
+        </div>
+    </div>
+
+    <!-- ATUALIZAÇÕES -->
+    <h5 class="fw-bold mb-3">📋 Atualizações (@Model.Atualizacoes.Count)</h5>
+
+    @if (!Model.Atualizacoes.Any())
+    {
+        <p class="text-muted">Nenhuma atualização ainda.</p>
+    }
+    else
+    {
+        <div class="d-flex flex-column gap-3 mb-4">
+            @foreach (var at in Model.Atualizacoes.OrderBy(a => a.CriadoEm))
+            {
+                <div class="card border-0 bg-light">
+                    <div class="card-body py-3">
+                        <p class="mb-1">@at.Mensagem</p>
+                        <small class="text-muted">
+                            🔍 @at.Fiscal?.Nome &nbsp;|&nbsp;
+                            🕐 @at.CriadoEm.ToLocalTime().ToString("dd/MM/yyyy HH:mm")
+                        </small>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+
+    <!-- FORMULÁRIO DE ATUALIZAÇÃO (apenas Fiscal) -->
+    @if (isFiscal)
+    {
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <h6 class="fw-bold mb-3">✏️ Enviar atualização</h6>
+                <form method="post" asp-action="EnviarAtualizacao">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="alertaId" value="@Model.Id" />
+                    <div class="mb-3">
+                        <textarea name="mensagem" class="form-control" rows="3"
+                                  placeholder="Informe o cidadão sobre o andamento da resolução..." required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-success">Enviar atualização</button>
+                </form>
+            </div>
+        </div>
+    }
+</div>

@@ -1,0 +1,94 @@
+@{
+    ViewData["Title"] = "Registrar Alerta";
+}
+
+<div class="container py-4" style="max-width: 680px;">
+    <h2 class="mb-4 fw-bold">📍 Registrar Alerta</h2>
+
+    @if (TempData["Sucesso"] != null)
+    {
+        <div class="alert alert-success">@TempData["Sucesso"]</div>
+    }
+
+    <form method="post" enctype="multipart/form-data" asp-action="Create">
+        @Html.AntiForgeryToken()
+
+        <div class="mb-3">
+            <label for="relato" class="form-label fw-semibold">Descrição do problema</label>
+            <textarea id="relato" name="relato" class="form-control" rows="4"
+                      placeholder="Descreva o problema de saneamento observado..." required></textarea>
+            @if (!ViewData.ModelState.IsValid && ViewData.ModelState["relato"]?.Errors.Count > 0)
+            {
+                <span class="text-danger">@ViewData.ModelState["relato"]!.Errors[0].ErrorMessage</span>
+            }
+        </div>
+
+        <div class="mb-3">
+            <label for="endereco" class="form-label fw-semibold">Endereço / Local</label>
+            <div class="input-group">
+                <input type="text" id="endereco" name="endereco" class="form-control"
+                       placeholder="Ex: Rua das Flores, 123 - Bairro, Cidade" required />
+                <button type="button" class="btn btn-outline-secondary" onclick="obterLocalizacao()" title="Usar minha localização">
+                    📡 Usar GPS
+                </button>
+            </div>
+            @if (!ViewData.ModelState.IsValid && ViewData.ModelState["endereco"]?.Errors.Count > 0)
+            {
+                <span class="text-danger">@ViewData.ModelState["endereco"]!.Errors[0].ErrorMessage</span>
+            }
+            <small id="gpsStatus" class="text-muted"></small>
+        </div>
+
+        <!-- Campos ocultos para coordenadas GPS -->
+        <input type="hidden" id="latitude" name="latitude" />
+        <input type="hidden" id="longitude" name="longitude" />
+
+        <div class="mb-3">
+            <label for="imagem" class="form-label fw-semibold">Imagem (JPG ou PNG)</label>
+            <input type="file" id="imagem" name="imagem" class="form-control" accept="image/jpeg,image/png" />
+            @if (!ViewData.ModelState.IsValid && ViewData.ModelState["imagem"]?.Errors.Count > 0)
+            {
+                <span class="text-danger">@ViewData.ModelState["imagem"]!.Errors[0].ErrorMessage</span>
+            }
+        </div>
+
+        <button type="submit" class="btn btn-success px-4">Enviar Alerta</button>
+        <a asp-action="Index" class="btn btn-link">Cancelar</a>
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        function obterLocalizacao() {
+            const status = document.getElementById('gpsStatus');
+            if (!navigator.geolocation) {
+                status.textContent = 'GPS não suportado neste navegador.';
+                return;
+            }
+            status.textContent = 'Obtendo localização...';
+            navigator.geolocation.getCurrentPosition(
+                async (pos) => {
+                    const lat = pos.coords.latitude;
+                    const lon = pos.coords.longitude;
+                    document.getElementById('latitude').value = lat;
+                    document.getElementById('longitude').value = lon;
+
+                    // Geocodificação reversa via Nominatim (OpenStreetMap, gratuito)
+                    try {
+                        const resp = await fetch(
+                            `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`,
+                            { headers: { 'Accept-Language': 'pt-BR' } }
+                        );
+                        const data = await resp.json();
+                        document.getElementById('endereco').value = data.display_name ?? `${lat}, ${lon}`;
+                        status.textContent = '✅ Localização obtida com sucesso.';
+                    } catch {
+                        document.getElementById('endereco').value = `${lat}, ${lon}`;
+                        status.textContent = '✅ Coordenadas obtidas (endereço não resolvido).';
+                    }
+                },
+                () => { status.textContent = '❌ Não foi possível obter a localização.'; }
+            );
+        }
+    </script>
+}

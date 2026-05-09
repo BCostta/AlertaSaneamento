@@ -1,0 +1,63 @@
+@model IEnumerable<AlertaSaneamento.Models.Entities.Alerta>
+
+@{
+    ViewData["Title"] = "Alertas";
+    bool isFiscal = Context.Session.GetString("UsuarioTipo") == "Fiscal";
+}
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold mb-0">@(isFiscal ? "Todos os Alertas" : "Meus Alertas")</h2>
+        @if (!isFiscal)
+        {
+            <a asp-action="Create" class="btn btn-success">+ Novo Alerta</a>
+        }
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="text-center text-muted py-5">
+            <p style="font-size:2rem;">📭</p>
+            <p>Nenhum alerta registrado ainda.</p>
+        </div>
+    }
+    else
+    {
+        <div class="row g-4">
+            @foreach (var alerta in Model)
+            {
+                <div class="col-md-4">
+                    <div class="card h-100 shadow-sm border-0">
+                        @if (alerta.imagem != null)
+                        {
+                            <img src="data:@alerta.imagemTipo;base64,@Convert.ToBase64String(alerta.imagem)"
+                                 class="card-img-top"
+                                 alt="Imagem do alerta"
+                                 style="max-height: 180px; object-fit: cover;" />
+                        }
+                        <div class="card-body">
+                            @if (isFiscal && alerta.Usuario != null)
+                            {
+                                <small class="text-muted">👤 @alerta.Usuario.Nome</small><br />
+                            }
+                            <p class="card-text mt-1">@alerta.relato</p>
+                            @if (!string.IsNullOrEmpty(alerta.Endereco))
+                            {
+                                <p class="text-muted small mb-1">📍 @alerta.Endereco</p>
+                            }
+                            <small class="text-muted">🕐 @alerta.CriadoEm.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</small>
+                        </div>
+                        <div class="card-footer bg-white border-0 d-flex justify-content-between align-items-center">
+                            <span class="badge bg-secondary">
+                                💬 @alerta.Atualizacoes.Count atualização(ões)
+                            </span>
+                            <a asp-action="Detalhes" asp-route-id="@alerta.Id" class="btn btn-sm btn-outline-success">
+                                Ver detalhes
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>

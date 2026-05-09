@@ -1,0 +1,27 @@
+## .NET / ASP.NET Core
+bin/
+obj/
+*.user
+*.suo
+.vs/
+
+## Publicação
+publish/
+out/
+
+## Logs
+*.log
+logs/
+
+## Secrets — NUNCA commitar
+appsettings.Production.json
+appsettings.Development.json
+secrets.json
+
+## NuGet
+*.nupkg
+.nuget/
+
+## OS
+.DS_Store
+Thumbs.db
