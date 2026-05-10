@@ -3,11 +3,12 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
 # Copia o csproj e restaura as dependências
-COPY AlertaSaneamento.csproj .
-RUN dotnet restore AlertaSaneamento.csproj
+COPY AlertaSaneamento/AlertaSaneamento.csproj AlertaSaneamento/
+RUN dotnet restore AlertaSaneamento/AlertaSaneamento.csproj
 
 # Copia o restante do código e publica
-COPY . .
+COPY AlertaSaneamento/ AlertaSaneamento/
+WORKDIR /src/AlertaSaneamento
 RUN dotnet publish AlertaSaneamento.csproj -c Release -o /app/publish
 
 # Etapa de runtime
