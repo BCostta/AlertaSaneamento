@@ -21,10 +21,10 @@ namespace AlertaSaneamento.Controllers
             return View();
         }
 
-        // POST /Usuario/Cadastro
+        // POST /Usuario/Cadastro — sempre cadastra como Cidadão
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Cadastro(string nome, string email, string senha, TipoUsuario tipo)
+        public async Task<IActionResult> Cadastro(string nome, string email, string senha)
         {
             if (await _context.Usuarios.AnyAsync(u => u.Email == email))
             {
@@ -38,13 +38,53 @@ namespace AlertaSaneamento.Controllers
                 Nome = nome,
                 Email = email,
                 SenhaHash = BCrypt.Net.BCrypt.HashPassword(senha),
-                Tipo = tipo
+                Tipo = TipoUsuario.Cidadao
             };
 
             _context.Usuarios.Add(usuario);
             await _context.SaveChangesAsync();
 
             return RedirectToAction("Login");
+        }
+
+        // GET /Usuario/CadastroFiscal — apenas Fiscal logado pode acessar
+        [HttpGet]
+        public IActionResult CadastroFiscal()
+        {
+            if (HttpContext.Session.GetString("UsuarioTipo") != TipoUsuario.Fiscal.ToString())
+                return RedirectToAction("Login");
+
+            return View();
+        }
+
+        // POST /Usuario/CadastroFiscal — apenas Fiscal logado pode cadastrar outro Fiscal
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CadastroFiscal(string nome, string email, string senha)
+        {
+            if (HttpContext.Session.GetString("UsuarioTipo") != TipoUsuario.Fiscal.ToString())
+                return RedirectToAction("Login");
+
+            if (await _context.Usuarios.AnyAsync(u => u.Email == email))
+            {
+                ModelState.AddModelError("email", "Este e-mail já está cadastrado.");
+                return View();
+            }
+
+            var usuario = new Usuario
+            {
+                Id = Guid.NewGuid(),
+                Nome = nome,
+                Email = email,
+                SenhaHash = BCrypt.Net.BCrypt.HashPassword(senha),
+                Tipo = TipoUsuario.Fiscal
+            };
+
+            _context.Usuarios.Add(usuario);
+            await _context.SaveChangesAsync();
+
+            TempData["Sucesso"] = "Fiscal cadastrado com sucesso.";
+            return RedirectToAction("CadastroFiscal");
         }
 
         // GET /Usuario/Login

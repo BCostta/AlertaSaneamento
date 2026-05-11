@@ -1,5 +1,5 @@
 @{
-    ViewData["Title"] = "Cadastro";
+    ViewData["Title"] = "Cadastrar Fiscal";
 }
 
 <div class="container py-5">
@@ -8,10 +8,15 @@
 
             <div class="card border-0 shadow-sm">
                 <div class="card-body p-4">
-                    <h2 class="fw-bold mb-1 text-center">Criar conta</h2>
-                    <p class="text-muted text-center mb-4">Registre-se para enviar alertas</p>
+                    <h2 class="fw-bold mb-1 text-center">Cadastrar Fiscal</h2>
+                    <p class="text-muted text-center mb-4">Crie uma conta de fiscal para o sistema</p>
 
-                    <form method="post" asp-action="Cadastro">
+                    @if (TempData["Sucesso"] != null)
+                    {
+                        <div class="alert alert-success">@TempData["Sucesso"]</div>
+                    }
+
+                    <form method="post" asp-action="CadastroFiscal">
                         @Html.AntiForgeryToken()
 
                         <div class="mb-3">
@@ -37,12 +42,11 @@
                         </div>
 
                         <div class="d-grid mb-3">
-                            <button type="submit" class="btn btn-success btn-lg">Cadastrar</button>
+                            <button type="submit" class="btn btn-primary btn-lg">Cadastrar Fiscal</button>
                         </div>
 
                         <p class="text-center mb-0">
-                            Já tem conta?
-                            <a asp-action="Login" class="text-success fw-semibold">Entrar</a>
+                            <a asp-controller="Alerta" asp-action="Index" class="text-muted">← Voltar para alertas</a>
                         </p>
                     </form>
                 </div>
